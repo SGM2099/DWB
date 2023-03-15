@@ -1,8 +1,11 @@
 package com.product.api.service;
 
+import com.product.api.dto.ApiResponse;
 import com.product.api.entity.Category;
 import com.product.api.repository.RepoCategory;
+import com.product.exception.ApiException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,68 +23,78 @@ public class SvcCategoryImp implements SvcCategory {
 
     @Override
     public Category getCategory(Integer category_id) {
-        return repo.findByCategoryId(category_id);
+
+        Category category = repo.findByCategoryId(category_id);
+
+        if (category == null)
+            throw new ApiException(HttpStatus.NOT_FOUND, "category does not exist");
+        else
+            return category;
+
     }
 
     @Override
-    public String createRegion(Category category) {
+    public ApiResponse createRegion(Category category) {
 
         Category categorySaved = repo.findByCategory(category.getCategory());
 
         if (categorySaved != null){
-            if (categorySaved.getStatus() == 0)
+            if (categorySaved.getStatus() == 0) {
+
                 repo.activateCategory(categorySaved.getCategory_id());
-            else
-                return "category already exist";
+                return new ApiResponse("category has been activated");
+
+            } else
+                throw new ApiException(HttpStatus.BAD_REQUEST, "category already exist");
         }
 
         repo.createCategory(category.getCategory(), category.getAcronym());
-        return "category created";
+        return new ApiResponse("category created");
 
     }
 
     @Override
-    public String updateRegion(Integer category_id, Category category) {
+    public ApiResponse updateRegion(Integer category_id, Category category) {
 
         Category categorySaved = repo.findByCategoryId(category_id);
 
-        if (categorySaved != null){
+        if (categorySaved != null) {
 
             if (categorySaved.getStatus() == 0) {
-                return "category is not activated";
+                throw new ApiException(HttpStatus.BAD_REQUEST, "category is not activated");
             } else {
 
                 categorySaved = (Category) repo.findByCategory(category.getCategory());
 
                 if (categorySaved != null) {
-                    return "category already exist";
+                    throw new ApiException(HttpStatus.BAD_REQUEST, "category already exist");
                 } else {
 
-                    repo.updateCategory(category_id, category.getCategory());
-                    return "category updated";
+                    repo.updateCategory(category_id, category.getCategory(), category.getAcronym());
+                    return new ApiResponse("category updated");
 
                 }
 
             }
 
         } else {
-            return "category does not exist";
+            throw new ApiException(HttpStatus.NOT_FOUND, "category does not exist");
         }
 
     }
 
     @Override
-    public String deleteCategory(Integer category_id) {
+    public ApiResponse deleteCategory(Integer category_id) {
 
         Category categorySaved = repo.findByCategoryId(category_id);
 
         if (categorySaved != null){
 
             repo.deleteById(category_id);
-            return "category removed";
+            return new ApiResponse("category removed");
 
         } else {
-            return "category does not exist";
+            throw new ApiException(HttpStatus.NOT_FOUND, "category does not exist");
         }
 
     }

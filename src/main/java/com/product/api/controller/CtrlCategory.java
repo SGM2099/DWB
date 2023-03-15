@@ -1,7 +1,9 @@
 package com.product.api.controller;
 
+import com.product.api.dto.ApiResponse;
 import com.product.api.entity.Category;
 import com.product.api.service.SvcCategory;
+import com.product.exception.ApiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,17 +31,22 @@ public class CtrlCategory {
     }
 
     @PostMapping
-    public ResponseEntity<String> createCategory(@Valid @RequestBody Category category, BindingResult bindingResult) {
+    public ResponseEntity<ApiResponse> createCategory(@Valid @RequestBody Category category, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()){
+            throw new ApiException(HttpStatus.BAD_REQUEST, bindingResult.getAllErrors().get(0).getDefaultMessage());
+        }
+
         return new ResponseEntity<>(svcCategory.createRegion(category), HttpStatus.CREATED);
     }
 
     @PutMapping("/{category_id}")
-    public ResponseEntity<String> updateCategory(@PathVariable Integer category_id, @RequestBody Category category, BindingResult bindingResult) {
+    public ResponseEntity<ApiResponse> updateCategory(@PathVariable Integer category_id, @RequestBody Category category, BindingResult bindingResult) {
         return new ResponseEntity<>(svcCategory.updateRegion(category_id,category),HttpStatus.OK);
     }
 
     @DeleteMapping("/{category_id}")
-    public ResponseEntity<String> deleteCategory(@PathVariable Integer category_id) {
+    public ResponseEntity<ApiResponse> deleteCategory(@PathVariable Integer category_id) {
         return new ResponseEntity<>(svcCategory.deleteCategory(category_id),HttpStatus.OK);
     }
 
