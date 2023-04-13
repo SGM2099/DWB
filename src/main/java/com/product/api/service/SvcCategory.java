@@ -9,8 +9,8 @@ public interface SvcCategory {
 
     List<Category> getCategories();
     Category getCategory(Integer category_id);
-    ApiResponse createRegion(Category category);
-    ApiResponse updateRegion(Integer category_id, Category category);
+    ApiResponse createCategory(Category category);
+    ApiResponse updateCategory(Integer category_id, Category category);
     ApiResponse deleteCategory(Integer category_id);
 
 }

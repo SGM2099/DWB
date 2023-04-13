@@ -34,7 +34,7 @@ public class SvcCategoryImp implements SvcCategory {
     }
 
     @Override
-    public ApiResponse createRegion(Category category) {
+    public ApiResponse createCategory(Category category) {
 
         Category categorySaved = repo.findByCategory(category.getCategory());
 
@@ -54,7 +54,7 @@ public class SvcCategoryImp implements SvcCategory {
     }
 
     @Override
-    public ApiResponse updateRegion(Integer category_id, Category category) {
+    public ApiResponse updateCategory(Integer category_id, Category category) {
 
         Category categorySaved = repo.findByCategoryId(category_id);
 

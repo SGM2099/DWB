@@ -37,12 +37,12 @@ public class CtrlCategory {
             throw new ApiException(HttpStatus.BAD_REQUEST, bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
 
-        return new ResponseEntity<>(svcCategory.createRegion(category), HttpStatus.CREATED);
+        return new ResponseEntity<>(svcCategory.createCategory(category), HttpStatus.CREATED);
     }
 
     @PutMapping("/{category_id}")
     public ResponseEntity<ApiResponse> updateCategory(@PathVariable Integer category_id, @RequestBody Category category, BindingResult bindingResult) {
-        return new ResponseEntity<>(svcCategory.updateRegion(category_id,category),HttpStatus.OK);
+        return new ResponseEntity<>(svcCategory.updateCategory(category_id,category),HttpStatus.OK);
     }
 
     @DeleteMapping("/{category_id}")
