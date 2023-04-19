@@ -13,6 +13,7 @@ import com.product.api.repository.RepoProduct;
 import com.product.exception.ApiException;
 
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.List;
 
 @Service
 public class SvcProductImp implements SvcProduct {
@@ -22,6 +23,18 @@ public class SvcProductImp implements SvcProduct {
 
     @Autowired
     RepoCategory repoCategory;
+
+    @Override
+    public List<Product> getProducts() {
+
+        List<Product> products = repo.findByStatus(1);
+
+        for (Product product : products) {
+            product.setCategory(repoCategory.findByCategoryId(product.getCategory_id()));
+        }
+
+        return products;
+    }
 
     @Override
     public Product getProduct(String gtin) {
@@ -110,10 +123,28 @@ public class SvcProductImp implements SvcProduct {
     @Override
     public ApiResponse updateProductStock(String gtin, Integer stock) {
         Product product = getProduct(gtin);
+
+        if (product == null)
+            throw new ApiException(HttpStatus.NOT_FOUND, "product does not exist");
         if(stock > product.getStock())
             throw new ApiException(HttpStatus.BAD_REQUEST, "stock to update is invalid");
 
         repo.updateProductStock(gtin, product.getStock() - stock);
         return new ApiResponse("product stock updated");
     }
+
+    @Override
+    public ApiResponse updateProductCategory(String gtin, Integer category) {
+        Product product = getProduct(gtin);
+        Category categoryFound = repoCategory.findByCategoryId(category);
+
+        if (product == null)
+            throw new ApiException(HttpStatus.NOT_FOUND, "product does not exist");
+        if (categoryFound == null)
+            throw new ApiException(HttpStatus.BAD_REQUEST, "category not found");
+
+        repo.updateProductCategory(gtin, category);
+        return new ApiResponse("product category updated");
+    }
+
 }

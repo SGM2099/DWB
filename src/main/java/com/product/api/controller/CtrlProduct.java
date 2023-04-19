@@ -14,6 +14,8 @@ import com.product.api.entity.Product;
 import com.product.api.service.SvcProduct;
 import com.product.exception.ApiException;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/product")
 public class CtrlProduct {
@@ -21,7 +23,11 @@ public class CtrlProduct {
 	@Autowired
 	SvcProduct svcProduct;
 
-    // 1. Implementar método getProduct
+    @GetMapping
+    public ResponseEntity<List<Product>> getProducts() {
+        return new ResponseEntity<>(svcProduct.getProducts(), HttpStatus.OK);
+    }
+
     @GetMapping("/{gtin}")
     public ResponseEntity<Product> getProduct(@PathVariable String gtin) {
         return new ResponseEntity<>(svcProduct.getProduct(gtin),HttpStatus.OK);
@@ -48,6 +54,13 @@ public class CtrlProduct {
         if(bindingResult.hasErrors())
             throw new ApiException(HttpStatus.BAD_REQUEST, bindingResult.getAllErrors().get(0).getDefaultMessage());
         return new ResponseEntity<>(svcProduct.updateProductStock(gtin, newStock.getStock()),HttpStatus.OK);
+    }
+
+    @PutMapping("/{gtin}/category")
+    public ResponseEntity<ApiResponse> updateProductCategory(@PathVariable("gtin") String gtin, @RequestBody Product newCategory, BindingResult bindingResult){
+        if(bindingResult.hasErrors())
+            throw new ApiException(HttpStatus.BAD_REQUEST, bindingResult.getAllErrors().get(0).getDefaultMessage());
+        return new ResponseEntity<>(svcProduct.updateProductCategory(gtin, newCategory.getCategory_id()),HttpStatus.OK);
     }
 	
 	@DeleteMapping("/{id}")
